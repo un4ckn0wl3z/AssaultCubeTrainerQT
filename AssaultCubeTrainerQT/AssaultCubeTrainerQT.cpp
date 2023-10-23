@@ -258,5 +258,12 @@ void AssaultCubeTrainerQT::no_recoil_fire_hack(int toggle)
 
 AssaultCubeTrainerQT::~AssaultCubeTrainerQT()
 {
-    delete ui;
+	delete m_health_hack_timer;
+	delete m_armor_hack_timer;
+	delete m_grenade_hack_timer;
+	delete m_rifle_ammo_hack_timer;
+	delete m_pistal_ammo_hack_timer;
+	delete m_sniper_ammo_hack_timer;
+	delete m_shotgun_ammo_hack_timer;
+	delete ui;
 }
