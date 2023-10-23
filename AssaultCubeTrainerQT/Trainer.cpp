@@ -1,6 +1,5 @@
 #include "Trainer.h"
 
-
 BOOL Trainer::get_proc_id(IN const wchar_t* process_name, OUT DWORD* pprocess_id)
 {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -32,13 +31,13 @@ BOOL Trainer::get_proc_id(IN const wchar_t* process_name, OUT DWORD* pprocess_id
 }
 
 
-BOOL Trainer::read_mem(IN HANDLE hProcess, IN std::shared_ptr<PLAYER_DATA> player_data)
+BOOL Trainer::read_mem(IN HANDLE hProcess, IN std::shared_ptr<Game::PLAYER_DATA> player_data)
 {
 	return ReadProcessMemory(hProcess, player_data->address, &player_data->value, sizeof(player_data->value), NULL);
 }
 
 
-BOOL Trainer::write_mem(IN HANDLE hProcess, IN std::shared_ptr<PLAYER_DATA> player_data)
+BOOL Trainer::write_mem(IN HANDLE hProcess, IN std::shared_ptr<Game::PLAYER_DATA> player_data)
 {
 	return WriteProcessMemory(hProcess, player_data->address, &player_data->value, sizeof(player_data->value), NULL);
 }
@@ -124,75 +123,75 @@ BOOL Trainer::nop_ex(HANDLE hProcess, PBYTE dst, DWORD size)
 }
 
 
-void Trainer::init_player_data(IN std::shared_ptr<PLAYER> player)
+void Trainer::init_player_data(IN std::shared_ptr<Game::PLAYER> player)
 {
 	// ----------------- LOCAL PLAYER SETUP
-	player->local_player = std::make_shared<PLAYER_DATA>();
+	player->local_player = std::make_shared<Game::PLAYER_DATA>();
 
 	// ----------------- LOCAL RAPID FIRE SETUP
-	player->rapid_fire = std::make_shared<PLAYER_DATA>();
+	player->rapid_fire = std::make_shared<Game::PLAYER_DATA>();
 
 	// ----------------- no_recoil SETUP
-	player->no_recoil = std::make_shared<PLAYER_DATA>();
+	player->no_recoil = std::make_shared<Game::PLAYER_DATA>();
 
 	// ----------------- health SETUP
-	player->health = std::make_shared<PLAYER_DATA>();
+	player->health = std::make_shared<Game::PLAYER_DATA>();
 	player->health->offsets = std::make_shared<std::vector<PVOID>>();
 	player->health->offsets->push_back(reinterpret_cast<PVOID>(0xEC));
 
 	// ----------------- armor SETUP
-	player->armor = std::make_shared<PLAYER_DATA>();
+	player->armor = std::make_shared<Game::PLAYER_DATA>();
 	player->armor->offsets = std::make_shared<std::vector<PVOID>>();
 	player->armor->offsets->push_back(reinterpret_cast<PVOID>(0xF0));
 
 	// ----------------- grenade SETUP
-	player->grenade = std::make_shared<PLAYER_DATA>();
+	player->grenade = std::make_shared<Game::PLAYER_DATA>();
 	player->grenade->offsets = std::make_shared<std::vector<PVOID>>();
 	player->grenade->offsets->push_back(reinterpret_cast<PVOID>(0x144));
 
 	// ----------------- rifle_ammo SETUP
-	player->rifle_ammo = std::make_shared<PLAYER_DATA>();
+	player->rifle_ammo = std::make_shared<Game::PLAYER_DATA>();
 	player->rifle_ammo->offsets = std::make_shared<std::vector<PVOID>>();
 	player->rifle_ammo->offsets->push_back(reinterpret_cast<PVOID>(0x140));
 
 	// ----------------- rifle_mag SETUP
-	player->rifle_mag = std::make_shared<PLAYER_DATA>();
+	player->rifle_mag = std::make_shared<Game::PLAYER_DATA>();
 	player->rifle_mag->offsets = std::make_shared<std::vector<PVOID>>();
 	player->rifle_mag->offsets->push_back(reinterpret_cast<PVOID>(0x11C));
 
 	// ----------------- pistal_ammo SETUP
-	player->pistal_ammo = std::make_shared<PLAYER_DATA>();
+	player->pistal_ammo = std::make_shared<Game::PLAYER_DATA>();
 	player->pistal_ammo->offsets = std::make_shared<std::vector<PVOID>>();
 	player->pistal_ammo->offsets->push_back(reinterpret_cast<PVOID>(0x12C));
 
 	// ----------------- pistal_mag SETUP
-	player->pistal_mag = std::make_shared<PLAYER_DATA>();
+	player->pistal_mag = std::make_shared<Game::PLAYER_DATA>();
 	player->pistal_mag->offsets = std::make_shared<std::vector<PVOID>>();
 	player->pistal_mag->offsets->push_back(reinterpret_cast<PVOID>(0x108));
 
 	// ----------------- sniper_ammo SETUP
-	player->sniper_ammo = std::make_shared<PLAYER_DATA>();
+	player->sniper_ammo = std::make_shared<Game::PLAYER_DATA>();
 	player->sniper_ammo->offsets = std::make_shared<std::vector<PVOID>>();
 	player->sniper_ammo->offsets->push_back(reinterpret_cast<PVOID>(0x13C));
 
 	// ----------------- sniper_mag SETUP
-	player->sniper_mag = std::make_shared<PLAYER_DATA>();
+	player->sniper_mag = std::make_shared<Game::PLAYER_DATA>();
 	player->sniper_mag->offsets = std::make_shared<std::vector<PVOID>>();
 	player->sniper_mag->offsets->push_back(reinterpret_cast<PVOID>(0x118));
 
 	// ----------------- shotgun_ammo SETUP
-	player->shotgun_ammo = std::make_shared<PLAYER_DATA>();
+	player->shotgun_ammo = std::make_shared<Game::PLAYER_DATA>();
 	player->shotgun_ammo->offsets = std::make_shared<std::vector<PVOID>>();
 	player->shotgun_ammo->offsets->push_back(reinterpret_cast<PVOID>(0x134));
 
 	// ----------------- shotgun_mag SETUP
-	player->shotgun_mag = std::make_shared<PLAYER_DATA>();
+	player->shotgun_mag = std::make_shared<Game::PLAYER_DATA>();
 	player->shotgun_mag->offsets = std::make_shared<std::vector<PVOID>>();
 	player->shotgun_mag->offsets->push_back(reinterpret_cast<PVOID>(0x110));
 }
 
 
-BOOL Trainer::init_player_dynamic_address(IN HANDLE hProcess, IN PVOID modulebase_address, IN OUT std::shared_ptr<PLAYER> player)
+BOOL Trainer::init_player_dynamic_address(IN HANDLE hProcess, IN PVOID modulebase_address, IN OUT std::shared_ptr<Game::PLAYER> player)
 {
 
 	// Get dynamic local player address

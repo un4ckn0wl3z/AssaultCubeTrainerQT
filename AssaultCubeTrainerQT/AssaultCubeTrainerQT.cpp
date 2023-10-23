@@ -1,5 +1,7 @@
-
 #include "AssaultCubeTrainerQT.h"
+
+#include "Game.h"
+#include "Trainer.h"
 
 #include <locale>
 #include <codecvt>
@@ -34,7 +36,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 	connect(ui->noRecoilCheckbox, &QCheckBox::toggled, this, &AssaultCubeTrainerQT::no_recoil_fire_hack);
 
 	connect(m_health_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->health)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->health)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->health failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -43,7 +45,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 
 
 	connect(m_armor_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->armor)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->armor)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->armor failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -52,7 +54,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 
 
 	connect(m_grenade_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->grenade)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->grenade)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->grenade failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -60,7 +62,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 	});
 
 	connect(m_rifle_ammo_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->rifle_ammo)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->rifle_ammo)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->rifle_ammo failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -69,7 +71,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 
 
 	connect(m_pistal_ammo_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->pistal_ammo)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->pistal_ammo)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->pistal_ammo failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -78,7 +80,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 
 
 	connect(m_sniper_ammo_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->sniper_ammo)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->sniper_ammo)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->sniper_ammo failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -86,7 +88,7 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 	});
 
 	connect(m_shotgun_ammo_hack_timer, &QTimer::timeout, [=]() {
-		if ((Trainer::write_mem(hProcess, player->shotgun_ammo)) == FALSE)
+		if ((Trainer::write_mem(Game::hProcess, Game::player->shotgun_ammo)) == FALSE)
 		{
 			qDebug() << "[!] WriteProcessMemory player->shotgun_ammo failed with error code: " << GetLastError();
 			exit(EXIT_FAILURE);
@@ -94,12 +96,12 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 	});
 
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	std::string process_name_utf8 = converter.to_bytes(process_name);
+	std::string process_name_utf8 = converter.to_bytes(Game::process_name);
 
-	Trainer::init_player_data(player);
+	Trainer::init_player_data(Game::player);
 
 	// Get game process ID
-	if (!Trainer::get_proc_id(process_name, &process_id))
+	if (!Trainer::get_proc_id(Game::process_name, &Game::process_id))
 	{
 		qDebug() << "[!] GetProcId failed with error code: " << GetLastError();
 		msgBox.exec();
@@ -108,19 +110,19 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 	 
 
 	// Get ac_client.exe base address
-	if (!Trainer::get_module_base_address(process_id, process_name, &modulebase_address))
+	if (!Trainer::get_module_base_address(Game::process_id, Game::process_name, &Game::modulebase_address))
 	{
 		qDebug() << "[!] GetModuleBaseAddress failed with error code: " << GetLastError();
 	}
 
 	// Get process handle
-	hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, process_id);
-	if (hProcess == NULL)
+	Game::hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, Game::process_id);
+	if (Game::hProcess == NULL)
 	{
 		qDebug() << "[!] OpenProcess failed with error code: " << GetLastError();
 	}
 
-	if (Trainer::init_player_dynamic_address(hProcess, modulebase_address, player) != TRUE)
+	if (Trainer::init_player_dynamic_address(Game::hProcess, Game::modulebase_address, Game::player) != TRUE)
 	{
 		qDebug() << "[!] Cannot init_player_dynamic_address: " << GetLastError();
 	}
@@ -131,9 +133,9 @@ AssaultCubeTrainerQT::AssaultCubeTrainerQT(QWidget *parent)
 
 void AssaultCubeTrainerQT::health_hack(int toggle)
 {
-	player->health->toggle = toggle;
-	if (player->health->toggle) {
-		player->health->value = 1337;
+	Game::player->health->toggle = toggle;
+	if (Game::player->health->toggle) {
+		Game::player->health->value = 1337;
 		m_health_hack_timer->start(100);
 	}
 	else {
@@ -144,9 +146,9 @@ void AssaultCubeTrainerQT::health_hack(int toggle)
 
 void AssaultCubeTrainerQT::armor_hack(int toggle)
 {
-	player->armor->toggle = toggle;
-	if (player->armor->toggle) {
-		player->armor->value = 1337;
+	Game::player->armor->toggle = toggle;
+	if (Game::player->armor->toggle) {
+		Game::player->armor->value = 1337;
 		m_armor_hack_timer->start(100);
 	}
 	else {
@@ -156,9 +158,9 @@ void AssaultCubeTrainerQT::armor_hack(int toggle)
 
 void AssaultCubeTrainerQT::grenade_hack(int toggle)
 {
-	player->grenade->toggle = toggle;
-	if (player->grenade->toggle) {
-		player->grenade->value = 1337;
+	Game::player->grenade->toggle = toggle;
+	if (Game::player->grenade->toggle) {
+		Game::player->grenade->value = 1337;
 		m_grenade_hack_timer->start(100);
 	}
 	else {
@@ -168,9 +170,9 @@ void AssaultCubeTrainerQT::grenade_hack(int toggle)
 
 void AssaultCubeTrainerQT::rifle_ammo_hack(int toggle)
 {
-	player->rifle_ammo->toggle = toggle;
-	if (player->rifle_ammo->toggle) {
-		player->rifle_ammo->value = 1337;
+	Game::player->rifle_ammo->toggle = toggle;
+	if (Game::player->rifle_ammo->toggle) {
+		Game::player->rifle_ammo->value = 1337;
 		m_rifle_ammo_hack_timer->start(100);
 	}
 	else {
@@ -180,9 +182,9 @@ void AssaultCubeTrainerQT::rifle_ammo_hack(int toggle)
 
 void AssaultCubeTrainerQT::pistal_ammo_hack(int toggle)
 {
-	player->pistal_ammo->toggle = toggle;
-	if (player->pistal_ammo->toggle) {
-		player->pistal_ammo->value = 1337;
+	Game::player->pistal_ammo->toggle = toggle;
+	if (Game::player->pistal_ammo->toggle) {
+		Game::player->pistal_ammo->value = 1337;
 		m_pistal_ammo_hack_timer->start(100);
 	}
 	else {
@@ -192,9 +194,9 @@ void AssaultCubeTrainerQT::pistal_ammo_hack(int toggle)
 
 void AssaultCubeTrainerQT::sniper_ammo_hack(int toggle)
 {
-	player->sniper_ammo->toggle = toggle;
-	if (player->sniper_ammo->toggle) {
-		player->sniper_ammo->value = 1337;
+	Game::player->sniper_ammo->toggle = toggle;
+	if (Game::player->sniper_ammo->toggle) {
+		Game::player->sniper_ammo->value = 1337;
 		m_sniper_ammo_hack_timer->start(100);
 	}
 	else {
@@ -204,9 +206,9 @@ void AssaultCubeTrainerQT::sniper_ammo_hack(int toggle)
 
 void AssaultCubeTrainerQT::shotgun_ammo_hack(int toggle)
 {
-	player->shotgun_ammo->toggle = toggle;
-	if (player->shotgun_ammo->toggle) {
-		player->shotgun_ammo->value = 1337;
+	Game::player->shotgun_ammo->toggle = toggle;
+	if (Game::player->shotgun_ammo->toggle) {
+		Game::player->shotgun_ammo->value = 1337;
 		m_shotgun_ammo_hack_timer->start(100);
 	}
 	else {
@@ -216,17 +218,17 @@ void AssaultCubeTrainerQT::shotgun_ammo_hack(int toggle)
 
 void AssaultCubeTrainerQT::rapid_fire_hack(int toggle)
 {
-	player->rapid_fire->toggle = toggle;
-	if (player->rapid_fire->toggle)
+	Game::player->rapid_fire->toggle = toggle;
+	if (Game::player->rapid_fire->toggle)
 	{
 
-		if ((Trainer::nop_ex(hProcess, (PBYTE)player->rapid_fire->address, 2)) == FALSE)
+		if ((Trainer::nop_ex(Game::hProcess, (PBYTE)Game::player->rapid_fire->address, 2)) == FALSE)
 		{
 			qDebug() << "[!] NopEx player->rapid_fire failed with error code: " << GetLastError();
 		};
 	}
 	else {
-		if ((Trainer::patch_mem_ex(hProcess, (PBYTE)player->rapid_fire->address, (PBYTE)"\x89\x08", 2)) == FALSE)
+		if ((Trainer::patch_mem_ex(Game::hProcess, (PBYTE)Game::player->rapid_fire->address, (PBYTE)"\x89\x08", 2)) == FALSE)
 		{
 			qDebug() << "[!] PatchMemEx player->rapid_fire failed with error code: " << GetLastError();
 		};
@@ -236,17 +238,17 @@ void AssaultCubeTrainerQT::rapid_fire_hack(int toggle)
 
 void AssaultCubeTrainerQT::no_recoil_fire_hack(int toggle)
 {
-	player->no_recoil->toggle = toggle;
-	if (player->no_recoil->toggle)
+	Game::player->no_recoil->toggle = toggle;
+	if (Game::player->no_recoil->toggle)
 	{
 
-		if ((Trainer::nop_ex(hProcess, (PBYTE)player->no_recoil->address, 5)) == FALSE)
+		if ((Trainer::nop_ex(Game::hProcess, (PBYTE)Game::player->no_recoil->address, 5)) == FALSE)
 		{
 			qDebug() << "[!] NopEx player->no_recoil failed with error code: " << GetLastError();
 		};
 	}
 	else {
-		if ((Trainer::patch_mem_ex(hProcess, (PBYTE)player->no_recoil->address, (PBYTE)"\xF3\x0F\x11\x50\x40", 5)) == FALSE)
+		if ((Trainer::patch_mem_ex(Game::hProcess, (PBYTE)Game::player->no_recoil->address, (PBYTE)"\xF3\x0F\x11\x50\x40", 5)) == FALSE)
 		{
 			qDebug() << "[!] PatchMemEx player->no_recoil failed with error code: " << GetLastError();
 
