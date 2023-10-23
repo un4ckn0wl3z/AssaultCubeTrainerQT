@@ -4,6 +4,8 @@ AssaultCube 1.3.0.2 multi-hack with C++ and QT frontend
 
 ![](https://github.com/un4ckn0wl3z/AssaultCubeTrainerQT/blob/main/trainer.png?raw=true)
 
+Video demo: <a href="https://youtu.be/gLlDuhzgrBA" target="_blank"> https://youtu.be/gLlDuhzgrBA</a>
+
 #### Features
 - 1337 Health
 - 1337 Armor
