@@ -8,11 +8,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QFile theme_file(QString(":/theme/DarkPurple.qss"));
-    theme_file.open(QFile::ReadOnly);   //open theme file
+    theme_file.open(QFile::ReadOnly);
 
     if (theme_file.isOpen())
     {
-        a.setStyleSheet(theme_file.readAll());        //set the theme here!
+        a.setStyleSheet(theme_file.readAll());
         theme_file.close();
     }
     else

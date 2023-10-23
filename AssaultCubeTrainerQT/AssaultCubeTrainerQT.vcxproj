@@ -101,11 +101,11 @@
     <QtUic Include="AssaultCubeTrainerQT.ui" />
     <QtMoc Include="AssaultCubeTrainerQT.h" />
     <ClCompile Include="AssaultCubeTrainerQT.cpp" />
-    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Trainer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common.hpp" />
+    <ClInclude Include="Trainer.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
